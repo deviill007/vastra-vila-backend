@@ -1,4 +1,5 @@
 require("dotenv").config();
+const port = 4000;
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
@@ -11,11 +12,22 @@ const { type } = require("os");
 app.use(express.json());
 app.use(
   cors({
-    origin: ["https://vastra-vila.onrender.com"],
+    origin: ["https://vastra-vila.onrender.com", "http://localhost:4000/"],
   })
 );
 
-const PORT = process.env.PORT;
+//database
+mongoose.connect(
+  "mongodb+srv://8kavyasharma:GzLPxgXBDOKU7XLj@cluster0.bdmiftz.mongodb.net/VastraVila?retryWrites=true&w=majority&appName=Cluster0"
+);
+
+app.listen(port, (error) => {
+  if (!error) {
+    console.log("Server Running on Port " + port);
+  } else {
+    console.log("Error " + error);
+  }
+});
 
 //API Creation
 app.get("/", (req, res) => {
@@ -149,54 +161,6 @@ const Users = mongoose.model("Users", {
     default: Date.now,
   },
 });
-
-//Api for Signup
-
-// app.post("/signup", async (req, res) => {
-//   const { username, email, password } = req.body;
-
-//   // Validate request body
-//   if (!username || !email || !password) {
-//     return res.status(400).json({
-//       success: false,
-//       errors: "Username, email, and password are required.",
-//     });
-//   }
-
-//   try {
-//     let check = await Users.findOne({
-//       email: req.body.email,
-//     });
-//     if (check) {
-//       res.status(400).json({
-//         success: false,
-//         errors: "Email already registered.",
-//       });
-//     }
-
-//     let cart = {};
-//     for (let i = 0; i < 300; i++) {
-//       cart[i] = 0;
-//     }
-//     const user = new Users({
-//       name: req.body.username,
-//       email: req.body.email,
-//       password: req.body.password,
-//       cartData: cart,
-//     });
-//     await user.save();
-//     const data = {
-//       user: {
-//         id: user.id,
-//       },
-//     };
-//     const token = jwt.sign(data, "secret_ecom");
-//     res.json({ success: true, token });
-//   } catch (error) {
-//     console.error("Error during user registration:", error);
-//     res.status(500).json({ success: false, errors: "Internal server error" });
-//   }
-// });
 
 //API for User login
 app.post("/signup", async (req, res) => {
@@ -348,12 +312,3 @@ app.post("/getcart", fetchUser, async (req, res) => {
   let userData = await Users.findOne({ _id: req.user.id });
   res.json(userData.cartData);
 });
-//MongoDb Contact
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => {
-    app.listen(PORT, () => {
-      console.log(`Server running on Port ${PORT}`);
-    });
-  })
-  .catch((err) => console.log(err));
