@@ -12,7 +12,9 @@ const { type } = require("os");
 app.use(express.json());
 app.use(
   cors({
-    origin: ["https://vastra-vila.onrender.com/", "http://localhost:3000/"],
+    origin: ["http://localhost:3000", "https://vastra-vila.onrender.com"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
