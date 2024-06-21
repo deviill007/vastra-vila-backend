@@ -51,7 +51,7 @@ app.use("/images", express.static("upload/images"));
 app.post("/upload", upload.single("product"), (req, res) => {
   res.json({
     success: 1,
-    image_url: `${process.env.API_BASE_URL}/${PORT}/images/${req.file.filename}`,
+    image_url: `https://vastra-vila.onrender.com/${PORT}/images/${req.file.filename}`,
   });
 });
 
