@@ -197,20 +197,26 @@ app.post("/signup", async (req, res) => {
       name: username,
       email,
       password,
-      cartData: cart,
+      cartData: {},
     });
 
     await user.save();
 
-    const data = {
-      user: {
-        id: user.id,
-      },
-    };
+    if (user) {
+      const data = {
+        user: {
+          id: user.id,
+        },
+      };
 
-    const token = jwt.sign(data, "secret_ecom");
-
-    return res.json({ success: true, token });
+      const token = jwt.sign(data, "secret_ecom");
+      return res.json({ success: true, token });
+    } else {
+      console.error("Error saving user during signup");
+      return res
+        .status(500)
+        .json({ success: false, errors: "Internal server error" });
+    }
   } catch (error) {
     if (error.code === 11000) {
       // Handle duplicate key error
