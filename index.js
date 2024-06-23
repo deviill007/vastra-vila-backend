@@ -1,3 +1,4 @@
+const dotenv = require("dotenv").config();
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
@@ -12,17 +13,9 @@ app.use(
   cors({
     origin: ["http://localhost:3000", "https://vastra-vila.onrender.com"],
     methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization", "auth-token"],
   })
 );
-
-// Database Connection With MongoDB
-mongoose.connect(
-  "mongodb+srv://8kavyasharma:GzLPxgXBDOKU7XLj@cluster0.bdmiftz.mongodb.net/VastraVila?retryWrites=true&w=majority&appName=Cluster0"
-);
-
-// paste your mongoDB Connection string above with password
-// password should not contain '@' special character
 
 //Image Storage Engine
 const storage = multer.diskStorage({
@@ -70,7 +63,7 @@ const Users = mongoose.model("Users", {
 });
 
 // Schema for creating Product
-const Product = mongoose.model("Product", {
+const Product = mongoose.model("ProductSchema", {
   id: { type: Number, required: true },
   name: { type: String, required: true },
   description: { type: String, required: true },
@@ -159,7 +152,7 @@ app.get("/allproducts", async (req, res) => {
 });
 
 // endpoint for getting latest products data
-app.get("/newcollections", async (req, res) => {
+app.get("/newcollection", async (req, res) => {
   let products = await Product.find({});
   let arr = products.slice(0).slice(-8);
   console.log("New Collections");
@@ -248,8 +241,12 @@ app.post("/removeproduct", async (req, res) => {
   res.json({ success: true, name: req.body.name });
 });
 
-// Starting Express Server
-app.listen(port, (error) => {
-  if (!error) console.log("Server Running on port " + port);
-  else console.log("Error : ", error);
-});
+// Starting Express Server and Database Connection With MongoDB
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => {
+    app.listen(port, () => {
+      console.log(`Server running on Port ${port}`);
+    });
+  })
+  .catch((err) => console.log(err));
